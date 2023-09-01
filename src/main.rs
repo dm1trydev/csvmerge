@@ -1,4 +1,5 @@
 mod merge_field;
+mod result_fields;
 
 use clap::Parser;
 use std::collections::HashMap;
