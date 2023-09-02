@@ -2,9 +2,9 @@ mod merge_field;
 mod result_fields;
 
 use clap::Parser;
-use std::collections::HashMap;
 use merge_field::MergeField;
-
+use result_fields::ResultFields;
+use std::collections::HashMap;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -20,6 +20,10 @@ struct Args {
     /// Название или номер столбца, для поиска во втором файле
     #[arg(short, long, value_parser = MergeField::parse)]
     destination: MergeField,
+
+    /// Список полей, которые необходимо взять из первого и второго файлов соответственно. Разделяются запятой между собой и пробелом между файлами
+    #[arg(short, long, value_parser = ResultFields::parse)]
+    result: ResultFields,
 
     file1_path: std::path::PathBuf,
     file2_path: std::path::PathBuf,
@@ -44,17 +48,26 @@ fn main() {
     for record in file2.records() {
         let row = record.expect("a CSV record");
 
-        let payment_id = match args.source {
-            MergeField::Number(number) => row.get(number).expect("a valid UTF-8 string").to_string(),
+        let union_column = match args.destination {
+            MergeField::Number(number) => {
+                row.get(number).expect("a valid UTF-8 string").to_string()
+            }
             _ => todo!(),
         };
 
-        let title = match args.destination {
-            MergeField::Number(number) => row.get(number).expect("a valid UTF-8 string").to_string(),
-            _ => todo!(),
-        };
+        let result_fields: Vec<String> = args
+            .result
+            .file2
+            .iter()
+            .map(|column| match column {
+                MergeField::Number(number) => {
+                    row.get(*number).expect("a valid UTF-8 string").to_string()
+                }
+                _ => todo!(),
+            })
+            .collect();
 
-        content.insert(payment_id, title);
+        content.insert(union_column, result_fields);
     }
 
     let mut writer = csv::Writer::from_path("result.csv").expect("some writer");
@@ -62,14 +75,32 @@ fn main() {
     for record in file1.records() {
         let row = record.expect("a CSV record");
 
-        let payment_id = row.get(0).expect("a valid UTF-8 string").to_string();
-        let uuid = row.get(1).expect("a valid UTF-8 string").to_string();
+        let union_column = match args.source {
+            MergeField::Number(number) => {
+                row.get(number).expect("a valid UTF-8 string").to_string()
+            }
+            _ => todo!(),
+        };
 
-        let title = match content.get(&payment_id) {
-            Some(title) => title.to_string(),
+        let mut result_fields: Vec<String> = args
+            .result
+            .file1
+            .iter()
+            .map(|column| match column {
+                MergeField::Number(number) => {
+                    row.get(*number).expect("a valid UTF-8 string").to_string()
+                }
+                _ => todo!(),
+            })
+            .collect();
+
+        let file2_result_fields = match content.get(&union_column) {
+            Some(fields) => fields.clone(),
             None => continue,
         };
 
-        writer.write_record(&[uuid, title]).expect("writing error");
+        result_fields.extend(file2_result_fields);
+
+        writer.write_record(&result_fields).expect("writing error");
     }
 }

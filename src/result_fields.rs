@@ -1,9 +1,9 @@
 use super::merge_field::MergeField;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ResultFields {
-    file1: Vec<MergeField>,
-    file2: Vec<MergeField>,
+    pub file1: Vec<MergeField>,
+    pub file2: Vec<MergeField>,
 }
 
 impl ResultFields {
