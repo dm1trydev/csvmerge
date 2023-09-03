@@ -7,20 +7,24 @@ use std::collections::HashMap;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Номер столбца, для поиска в первом файле
+    /// Column number to search in the first file
     #[arg(short, long)]
     source: usize,
 
-    /// Номер столбца, для поиска во втором файле
+    /// Column number to search in the second file
     #[arg(short, long)]
     destination: usize,
 
-    /// Список полей, которые необходимо взять из первого и второго файлов соответственно. Разделяются запятой между собой и пробелом между файлами
+    /// List of columns to be taken from the first and second files, respectively. Separated by a comma between themselves and a space between files
     #[arg(short, long, value_parser = ResultFields::parse)]
     result: ResultFields,
 
     file1_path: std::path::PathBuf,
     file2_path: std::path::PathBuf,
+
+    /// Path to result file
+    #[arg(short, long, default_value = "result.csv")]
+    output: std::path::PathBuf,
 }
 
 fn main() {
@@ -50,7 +54,7 @@ fn main() {
         content.insert(union_column, result_fields);
     }
 
-    let mut writer = csv::Writer::from_path("result.csv").expect("some writer");
+    let mut writer = csv::Writer::from_path(args.output).expect("some writer");
 
     for record in file1.records() {
         let row = record.expect("a CSV record");

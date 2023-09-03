@@ -1,22 +1,14 @@
-## Что делает
+## How it works
 
-Эта утилита возвращает результат объединения двух csv файлов по указанному столбцу в виде csv с набором выбранных столбцов из каждого csv
+This utility returns the result of concatenating two csv files by the specified column as a csv with a set of selected columns from each csv
 
-## Как использовать
-
-Если нужно объединить по первым столбцам в обоих файлах:
-
-`csvmerge /path/to/file1.csv /path/to/file2.csv`
-
-Пример с полными настройками:
+## How to use
 
 `csvmerge -s 0 -d 1 -r "0,1,2 0,2,3" /path/to/file1.csv /path/to/file2.csv`
 
-чтобы указать номера столбцов, по которым мержить, для первого и второго файла.
+## Options
 
-## Опции
-
-- `-s`, `--source` - номер столбца, для поиска в первом файле
-- `-d`, `--destination` - номер столбца, для поиска во втором файле
-- `-r`, `--result` - список полей, которые необходимо взять из первого и второго файлов соответственно. Разделяются запятой между собой и пробелом между файлами
-- `-o`, `--output` - путь к файлу с результатом
+- `-s`, `--source` - column number to search in the first file
+- `-d`, `--destination` - column number to search in the second file
+- `-r`, `--result` - list of columns to be taken from the first and second files, respectively. Separated by a comma between themselves and a space between files
+- `-o`, `--output` - path to result file
