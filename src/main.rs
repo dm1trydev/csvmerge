@@ -7,10 +7,6 @@ use std::collections::HashMap;
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
 struct Args {
-    /// Формат разделителей первого и второго csv файлов соответственно
-    #[arg(short = 'D', long, default_value_t = String::from(",,"))]
-    delimeter: String,
-
     /// Номер столбца, для поиска в первом файле
     #[arg(short, long)]
     source: usize,
@@ -31,6 +27,7 @@ fn main() {
     let args = Args::parse();
 
     let mut file1 = csv::Reader::from_path(args.file1_path).expect("Must be a CSV file.");
+
     let mut file2 = csv::Reader::from_path(args.file2_path).expect("Must be a CSV file.");
 
     let mut content = HashMap::new();
@@ -38,7 +35,10 @@ fn main() {
     for record in file2.records() {
         let row = record.expect("a CSV record");
 
-        let union_column = row.get(args.destination).expect("a valid UTF-8 string").to_string();
+        let union_column = row
+            .get(args.destination)
+            .expect("a valid UTF-8 string")
+            .to_string();
 
         let result_fields: Vec<String> = args
             .result
@@ -55,7 +55,10 @@ fn main() {
     for record in file1.records() {
         let row = record.expect("a CSV record");
 
-        let union_column = row.get(args.source).expect("a valid UTF-8 string").to_string();
+        let union_column = row
+            .get(args.source)
+            .expect("a valid UTF-8 string")
+            .to_string();
 
         let mut result_fields: Vec<String> = args
             .result
