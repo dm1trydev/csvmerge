@@ -31,9 +31,7 @@ fn main() {
     let args = Args::parse();
 
     let mut file1 = csv::Reader::from_path(args.file1_path).expect("Must be a CSV file.");
-
     let mut file2 = csv::Reader::from_path(args.file2_path).expect("Must be a CSV file.");
-
     let mut content = HashMap::new();
 
     for record in file2.records() {
